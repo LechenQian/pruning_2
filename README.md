@@ -1,12 +1,13 @@
 
 
 # How light can a neural net be
+
 Selina Qian
+
 Dec 12, 2022
 
 ## Contents
 - Background of this work
-- Understand the basic concept of **pruning**
 - Three-step Training Pipeline for Training Efficient Neural Networks
 - My implementation of **fine-grained pruning**
 
