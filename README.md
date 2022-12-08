@@ -1,40 +1,60 @@
 
 
 # How light can a neural net be
+Selina Qian
+Dec 12, 2022
 
-
-I would like to deep dive into the paper from Han lab - "Learning both Weights and Connections for Efficient Neural Networks". This study proposes a three-step method for training lightweight neural networks that both reduce model size and latency and can be deployed on-device while maintaining high accuracy. I will showcase the effect of pruning based on a small model and a toy dataset.
-
-## Contents:
+## Contents
 - Background of this work
 - Understand the basic concept of **pruning**
 - Three-step Training Pipeline for Training Efficient Neural Networks
-
 - My implementation of **fine-grained pruning**
 
-- Get a basic understanding of performance improvement (such as speedup) from pruning
 
 ## Background of this work
-**Neural networks have become ubiquitous in many applications. While large neural networks are very powerful, their size consumes considerable storage, memory bandwidth, and computational resources.**
+Many applications now use neural networks. Huge neural networks are extremely strong and they have been applied successfully to speech recognition, image analysis and adaptive control. However, the considerable storage, memory bandwidth, and computing resources required by neural networks make it challenging to implement on mobile devices. For instance, Running a 1 billion connection neural network at 20Hz would require 12.8W for DRAM access - well beyond the power envelope of a typical mobile device. 
 
-Neural networks are challenging to implement on mobile devices due of their intensive computational and memory requirements. Additionally, the architecture was predesigned for the network prior to training, which prevents training from improving the architecture. In order to overcome these restrictions, this study outline a pruning technique for learning only the crucial connections, which allows neural networks to store and compute an order of magnitude less data while maintaining their accuracy. This training process learns the network connectivity in addition to the weights very similar to human brain: during brain matures, some neurons will be lost through apoptosis, which helps to shape the brain and create functional neural networks.
+<img src="https://github.com/LechenQian/pruning_2/blob/main/figures/size_current.jpg" width="100%" />
+
+Additionally, the architecture was predesigned for the network prior to training, which prevents training from optimizing the architecture. In order to overcome these restrictions, this study[1] outline a pruning technique for learning only the crucial connections, which allows neural networks to store and compute an order of magnitude less data while maintaining their accuracy. Artificial neural networks, which loosely model the neurons in a biological brain. Interestingly, this training process learns the network connectivity and weights very much similar to human brain[2]: during brain matures, some neurons will be lost through apoptosis, which helps to shape the brain and create functional neural networks.
+
+
+I would like to deep dive into the paper from Han, Song, et al. - "Learning both Weights and Connections for Efficient Neural Networks". This study proposes a three-step method for training lightweight neural networks that both reduce model size and latency while maintaining high accuracy. I will showcase the effect of pruning using a small CNN model on MNIST dataset.
 
 ## Three-step Training Pipeline for Training Efficient Neural Networks
-Here are three major steps to make the neural network more light-weight:
-1. first train the network to identify the most crucial connections. 
-1. remove the unnecessary connections. 
-
-    You prune the connections that have low weights or in other words at least the network considers those weights to be not important during the training phase and once the pruning of those weights is done you'll have a less dense and relatively smaller network 
-1. retrained the network to adjust the weights of the remaining connections.
 
 <img src="https://github.com/LechenQian/pruning_2/blob/main/figures/pruning_diagram.jpg" width="100%" />
 
-### results from paper
-The researchers demonstrate through experimentation that the AlexNet and VGG16 models on the ImageNet dataset can be reduced to 9x and 13x of their original sizes while still being able to provide accuracy values that are almost identical.
+
+Here are three major steps to make the neural network more light-weight:
+1. First train the network to identify the most crucial connections. 
+    * Difference is that instead of training the network to get the final weights, they are learning which connections are important by setting certain thresholds! The criteria used inthis study for determining the importance of weights is the magnitude of weight value, *i.e.*, $Importance=|W|$
+
+1. Remove the unnecessary connections. 
+
+    * You prune the connections that have low weights or in other words at least the network considers those weights to be not important during the training phase. The approch is that you first define the sparsities of each layer or the whole network. Then we can find the corresponding weight threshold for pruning. Fine-grained pruning removes the synapses with low importance below threshold. Once the pruning of those weights is done you'll have a less dense and relatively smaller network. 
+1. Fine tune the remaining weights on the smaller network and repeat the step 2 Until reach the certain threshold of the performance
+    * This step is necessary and critical because without retraining, the accuracy of the network is significantly negatively impacted as I will demonstrate in my implementation.
+    * **Parameter Co-adaptation**: Importantly, as discussed in the paper, while doing retraining, it's better to keep the surviving trained parameters instead of reinitializing the parameter. The rationale is that random initialization will disrupt the already-good parameter solution foudn by the initial training process. In the case of CNNs, they contain fragile co-adapted weight features and it will better to keep them while retraining.
+    * Iterative Pruning gives better result on finding the proper connections. What we can do is that run more than one iterations involves pruning and retraining. In this way, we might be able to find the potentially minimal number of connections after several rounds of iterations. And this method has proven to be reducing the model size more without losing accuracy then one-step aggresive pruning.
+
+
+
+
+### Results from paper
+The researchers demonstrate through experimentation that the AlexNet and VGG16 models on the ImageNet dataset can be reduced to 9x and 13x of their original sizes while still being able to provide accuracy values that are almost identical. 
 
 
 <img src="https://github.com/LechenQian/pruning_2/blob/main/figures/pruning_result_paper.jpg" width="100%" />
 
+As can be seen in the picture below, the CONV and FC layers respond to pruning in distinct ways. We can observe how accuracy decreases as parameters are trimmed layer by layer. Compared to completely connected layers, the CONV layers (on the left) are more susceptible to pruning (on the right). The first convolutional layer is the one that is most susceptible to pruning among the CONV layers. In general, fully linked layers have more connections and plenty of room for pruning to cut down on redundancy without hurting the accuracy.
+
+<img src="https://github.com/LechenQian/pruning_2/blob/main/figures/sensitivty_paper.jpg" width="100%" />
+
+After pruning, AlexNet and VGGNet's storage needs are so minimal that all weights may be stored on the chip rather than off-chip DRAM.
+
+
+<img src="https://github.com/LechenQian/pruning_2/blob/main/figures/comparison_models.jpg" width="100%" />
 
 
 
@@ -132,5 +152,7 @@ I picked a set of aggresive sparcities and now the sparse model has 0.02 MiB in 
     Epoch 5 Sparse Accuracy 97.39% / Best Sparse Accuracy: 97.43%
 sparse model has accuracy=97.76% and the model size now is 0.02 MiB, which is 36.88X smaller than the 0.87 MiB original already small CNN model. This shows that even a small model has a great redundency and a big room for pruning. 
 
-
+## Reference
+[1] Han, Song, et al. "Learning both weights and connections for efficient neural network." Advances in neural information processing systems 28 (2015).
+[2] Rauschecker, J. P. "Neuronal mechanisms of developmental plasticity in the cat's visual system." Human neurobiology 3.2 (1984): 109-114.
 
