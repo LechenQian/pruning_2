@@ -7,9 +7,9 @@ Selina Qian
 Dec 12, 2022
 
 ## Contents
-- Background of this work
-- Three-step Training Pipeline for Training Efficient Neural Networks
-- My implementation of **fine-grained pruning**
+- [Background of this work](https://github.com/LechenQian/pruning_2/blob/main/README.md#background-of-this-work)
+- [Three-step Training Pipeline for Training Efficient Neural Networks](https://github.com/LechenQian/pruning_2/edit/main/README.md#three-step-training-pipeline-for-training-efficient-neural-networks)
+- [My implementation of **fine-grained pruning**](https://github.com/LechenQian/pruning_2/edit/main/README.md#my-implementation-of-fine-grained-pruning)
 
 
 ## Background of this work
@@ -110,13 +110,14 @@ Though I used a fairly small CNN network as an toy example here, you will still 
 
 ### Fine-grained pruning
 I perform fine-grained pruning based on the sparsities I pre-defined for each layer.
- **sparsity**: $\mathrm{sparsity} := \#\mathrm{Zeros} / \#W = 1 - \#\mathrm{Nonzeros} / \#W$
+ **sparsity**: 
+ $$\mathrm{sparsity} := number\ of\ \mathrm{Zeros} / number\ of\ W = 1 - number\ of\ \mathrm{Nonzeros} / number\ of\ W$$
 
-where $\#W$ is the number of elements in $W$.
+where number of $W$ is the number of elements in $W$.
 
 
 #### **Sensitivity scan**
-I runned a range of sparsities for pruning on a layer-by-layer basis and check the relationship between accuracy and layer sparsity.
+I runned a set of sparsities for pruning on a layer-by-layer basis and check the relationship between accuracy and layer sparsity.
 
 <img src="https://github.com/LechenQian/pruning_2/blob/main/figures/sensitivity_curves.png" width="100%" />
 
@@ -133,7 +134,7 @@ There is clearly an inverse relationship between pruning sparsity and model accu
 
 Since I only plan to do one iteration of pruning as demonstration purpose, I picked a set of aggresive sparcities. Now the sparse model has 0.02 MiB in size, which is 2.71% of original dense model size. Unfortunately the accuracy is only about 8.85% after pruning. This is not surprising that the accuracy dignificantly dropped after an aggresive pruning, which also necessitate the fine tuning step.
 
-<img src="https://github.com/LechenQian/pruning_2/blob/main/figures/histogram_pruned_weights.png.png" width="100%" />
+<img src="https://github.com/LechenQian/pruning_2/blob/main/figures/histogram_pruned_weights.png" width="100%" />
 
 ### Retraining the network
     Finetuning Fine-grained Pruned Sparse Model
@@ -142,9 +143,10 @@ Since I only plan to do one iteration of pruning as demonstration purpose, I pic
     Epoch 3 Sparse Accuracy 97.43% / Best Sparse Accuracy: 97.43%
     Epoch 4 Sparse Accuracy 97.42% / Best Sparse Accuracy: 97.43%
     Epoch 5 Sparse Accuracy 97.39% / Best Sparse Accuracy: 97.43%
-sparse model has accuracy=97.76% and the model size now is 0.02 MiB, which is 36.88X smaller than the 0.87 MiB original already small CNN model. This shows that even a small model has a great redundency and a big room for pruning. 
+A sparse model has accuracy=97.76% and the model size now is 0.02 MiB, which is 36.88X smaller than the 0.87 MiB original already small CNN model. This shows that even a small model has a great redundency and a big room for pruning. 
 
 ## Reference
 [1] Han, Song, et al. "Learning both weights and connections for efficient neural network." Advances in neural information processing systems 28 (2015).
+
 [2] Rauschecker, J. P. "Neuronal mechanisms of developmental plasticity in the cat's visual system." Human neurobiology 3.2 (1984): 109-114.
 
