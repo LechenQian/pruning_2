@@ -25,12 +25,14 @@ Here are three major steps to make the neural network more light-weight:
     You prune the connections that have low weights or in other words at least the network considers those weights to be not important during the training phase and once the pruning of those weights is done you'll have a less dense and relatively smaller network 
 1. retrained the network to adjust the weights of the remaining connections.
 
-**[pruning_diagram.jpg]**
+<img src="https://github.com/LechenQian/pruning_2/blob/main/figures/pruning_diagram.jpg" width="100%" />
 
 ### results from paper
 The researchers demonstrate through experimentation that the AlexNet and VGG16 models on the ImageNet dataset can be reduced to 9x and 13x of their original sizes while still being able to provide accuracy values that are almost identical.
 
-**[pruning_result_paper.jpg]**
+
+<img src="https://github.com/LechenQian/pruning_2/blob/main/figures/pruning_result_paper.jpg" width="100%" />
+
 
 
 
@@ -68,14 +70,16 @@ size=0.87 MiB.
 
 #### 
 The number of parameters across different layers varies substantially as shown below:
-
-**[num_parameters_prepruned]**
+<p align="center">
+    <img src="https://github.com/LechenQian/pruning_2/blob/main/figures/number_parameters_prepruned.png" width="50%" />
+</p>
 
 ## Number of parameters in each layer
 the number of each layer's parameters also affects the decision on sparsity selection. Layers with more #parameters require larger sparsities.
 
 #### The distribution of weight values in the dense model
-**[weight_distribution_prepruned]**
+
+<img src="https://github.com/LechenQian/pruning_2/blob/main/figures/histogram_prepruned_weights.png" width="100%" />
 
 The distribution of weights is centered on zero with tails dropping off quickly. Weights that are close to 0 are the ones that are lease important, which helps alleviate the impact of pruining on model accuracy.
 
@@ -98,7 +102,7 @@ This is known as **Magnitude-based Pruning**
 
 #### **Sensitivity scan**
 
-**[sensitivity curve.jpg]**
+<img src="https://github.com/LechenQian/pruning_2/blob/main/figures/sensitivity_curves.png" width="100%" />
 
 The relationship between pruning sparsity and model accuracy is inverse. When sparsity becomes higher, the model accuracy decreases.
 
@@ -115,7 +119,7 @@ not all of the layers showing the same sensitivity. From the plot, we can see th
 
 I picked a set of aggresive sparcities and now the sparse model has 0.02 MiB in size, which is 2.71% of original dense model size and the accuracy is  only about 8.85% after pruning. This is not surprising that the accuracy dignificantly dropped after an aggresive pruning, which also necessitate the fine tuning step.
 
-**[histogram_pruned_weights.png]**
+<img src="https://github.com/LechenQian/pruning_2/blob/main/figures/histogram_pruned_weights.png.png" width="100%" />
 
 ### Retraining the network
     Finetuning Fine-grained Pruned Sparse Model
