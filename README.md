@@ -1,4 +1,4 @@
-# pruning
+
 
 # How light can a neural net be
 
