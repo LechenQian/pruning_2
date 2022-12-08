@@ -13,7 +13,7 @@ Dec 12, 2022
 
 
 ## Background of this work
-Many applications now use neural networks. Huge neural networks are extremely strong and they have been applied successfully to speech recognition, image analysis and adaptive control. However, the considerable storage, memory bandwidth, and computing resources required by neural networks make it challenging to implement on mobile devices. For instance, Running a 1 billion connection neural network at 20Hz would require 12.8W for DRAM access - well beyond the power envelope of a typical mobile device. 
+Many applications now use neural networks. Huge neural networks are extremely strong and they have been applied successfully to speech recognition, image analysis and adaptive control. However, the considerable storage, memory bandwidth, and computing resources required by neural networks make it challenging to implement on mobile devices. For instance, running a 1 billion connection neural network at 20Hz would require 12.8W for DRAM access - well beyond the power envelope of a typical mobile device. 
 
 <img src="https://github.com/LechenQian/pruning_2/blob/main/figures/size_current.jpg" width="100%" />
 
@@ -62,7 +62,7 @@ After pruning, AlexNet and VGGNet's storage needs are so minimal that all weight
 ## My implementation of **fine-grained pruning**
 ### - Evaluate the Accuracy and Model Size of a Dense Model
 
-To first evaluate the accuracy and model size of a relatively small neural network, I train a 5-hidden-layer CNN toy model on the MNIST dataset.
+To first evaluate the accuracy and model size of a relatively small neural network, I trained a 5-hidden-layer CNN toy model on the MNIST dataset.
     
     class Net(nn.Module):
     # Constructor
@@ -88,19 +88,19 @@ To first evaluate the accuracy and model size of a relatively small neural netwo
             x = self.fc2(x)
             return F.log_softmax(x, dim=1)
 
-After just five epochs of training, this toy dense CNN model has accuracy=99.29% on the MNIST test set with
+After just five epochs of training, this dense CNN model has accuracy=99.29% on the MNIST test set with
 size=0.87 MiB. 
 
-#### 
-The number of parameters across different layers varies substantially as shown below:
+#### **Number of parameters in each layer**
+
+Given this trained model, we could check the number of parameters across different layers. The numbers vary substantially as shown below:
 <p align="center">
     <img src="https://github.com/LechenQian/pruning_2/blob/main/figures/number_parameters_prepruned.png" width="50%" />
 </p>
 
-## Number of parameters in each layer
-the number of each layer's parameters also affects the decision on sparsity selection. Layers with more #parameters require larger sparsities.
+The number of each layer's parameters also affects the decision on sparsity selection as we can roughly infer how much redundancy lies in each layer. Layers with more parameters will require a bigger pruning strength.
 
-#### The distribution of weight values in the dense model
+#### **The distribution of weight values in the dense model**
 
 <img src="https://github.com/LechenQian/pruning_2/blob/main/figures/histogram_prepruned_weights.png" width="100%" />
 
@@ -109,27 +109,18 @@ The distribution of weights is centered on zero with tails dropping off quickly.
 Though I used a fairly small CNN network as an toy example here, you will still be amazed by how much redundency it has from the following pruning steps. Of course, the goal of pruning is to reduce the model size while maintaining the accuracy.
 
 ### Fine-grained pruning
-Fine-grained pruning removes the synapses with lowest importance. The weight tensor $W$ will become sparse after fine-grained pruning, which can be described with **sparsity**:
-
-> $\mathrm{sparsity} := \#\mathrm{Zeros} / \#W = 1 - \#\mathrm{Nonzeros} / \#W$
+I perform fine-grained pruning based on the sparsities I pre-defined for each layer.
+ **sparsity**: $\mathrm{sparsity} := \#\mathrm{Zeros} / \#W = 1 - \#\mathrm{Nonzeros} / \#W$
 
 where $\#W$ is the number of elements in $W$.
 
-#### **Maginitude-based pruning**
-For fine-grained pruning, a widely-used importance is the magnitude of weight value, *i.e.*,
-
-$Importance=|W|$
-
-This is known as **Magnitude-based Pruning**
-
 
 #### **Sensitivity scan**
+I runned a range of sparsities for pruning on a layer-by-layer basis and check the relationship between accuracy and layer sparsity.
 
 <img src="https://github.com/LechenQian/pruning_2/blob/main/figures/sensitivity_curves.png" width="100%" />
 
-The relationship between pruning sparsity and model accuracy is inverse. When sparsity becomes higher, the model accuracy decreases.
-
-not all of the layers showing the same sensitivity. From the plot, we can see that the first convolution layer (backbone.conv0) is the most sensitive tot he pruning sparsity.
+There is clearly an inverse relationship between pruning sparsity and model accuracy: when sparsity becomes higher, the model accuracy decreases. As expected from the paper, not all of the layers showing the same sensitivity in my implementation. From the plot, we can see that the first convolution layer is also the most sensitive to the pruning sparsity. And FC layers with much more number of weights are more immune to pruning.
 
 #### **Decide the sparsity for each layer**
     sparsity_dict = {
@@ -140,7 +131,7 @@ not all of the layers showing the same sensitivity. From the plot, we can see th
     'fc2.weight': 0.9
     }
 
-I picked a set of aggresive sparcities and now the sparse model has 0.02 MiB in size, which is 2.71% of original dense model size and the accuracy is  only about 8.85% after pruning. This is not surprising that the accuracy dignificantly dropped after an aggresive pruning, which also necessitate the fine tuning step.
+Since I only plan to do one iteration of pruning as demonstration purpose, I picked a set of aggresive sparcities. Now the sparse model has 0.02 MiB in size, which is 2.71% of original dense model size. Unfortunately the accuracy is only about 8.85% after pruning. This is not surprising that the accuracy dignificantly dropped after an aggresive pruning, which also necessitate the fine tuning step.
 
 <img src="https://github.com/LechenQian/pruning_2/blob/main/figures/histogram_pruned_weights.png.png" width="100%" />
 
