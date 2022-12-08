@@ -13,7 +13,7 @@ Dec 12, 2022
 
 
 ## Background of this work
-Many applications now use neural networks. Huge neural networks are extremely strong and they have been applied successfully to speech recognition, image analysis and adaptive control. However, the considerable storage, memory bandwidth, and computing resources required by neural networks make it challenging to implement on mobile devices. For instance, running a 1 billion connection neural network at 20Hz would require 12.8W for DRAM access - well beyond the power envelope of a typical mobile device. 
+Many applications now use neural networks for versatile purposes. Huge neural networks are extremely powerful and they have been applied successfully to speech recognition, image analysis and adaptive control. However, the considerable storage, memory bandwidth, and computing resources required by neural networks make it challenging to implement on mobile devices. For instance, running a 1 billion connection neural network at 20Hz would require 12.8W for DRAM access - well beyond the power envelope of a typical mobile device. 
 
 <img src="https://github.com/LechenQian/pruning_2/blob/main/figures/size_current.jpg" width="100%" />
 
