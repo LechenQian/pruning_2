@@ -7,17 +7,17 @@ Selina Qian
 Dec 12, 2022
 
 ## Contents
-- [Background of this work](https://github.com/LechenQian/pruning_2/blob/main/blog.md#background-of-this-work)
-- [Three-step Training Pipeline for Training Efficient Neural Networks](https://github.com/LechenQian/pruning_2/edit/main/blog.md#three-step-training-pipeline-for-training-efficient-neural-networks)
-- [My implementation of **fine-grained pruning**](https://github.com/LechenQian/pruning_2/edit/main/blog.md#my-implementation-of-fine-grained-pruning)
+- [Background of this work](https://github.com/LechenQian/pruning_2/blob/main/README.md#background-of-this-work)
+- [Three-step Training Pipeline for Training Efficient Neural Networks](https://github.com/LechenQian/pruning_2/edit/main/README.md#three-step-training-pipeline-for-training-efficient-neural-networks)
+- [My implementation of **fine-grained pruning**](https://github.com/LechenQian/pruning_2/edit/main/README.md#my-implementation-of-fine-grained-pruning)
 
 
 ## Background of this work
-Many applications now use neural networks. Huge neural networks are extremely strong and they have been applied successfully to speech recognition, image analysis and adaptive control. However, the considerable storage, memory bandwidth, and computing resources required by neural networks make it challenging to implement on mobile devices. For instance, running a 1 billion connection neural network at 20Hz would require 12.8W for DRAM access - well beyond the power envelope of a typical mobile device. 
+Many applications now use neural networks for versatile purposes. Huge neural networks are extremely powerful and they have been applied successfully to speech recognition, image analysis and adaptive control. However, the considerable storage, memory bandwidth, and computing resources required by neural networks make it challenging to implement on mobile devices. Running a 1 billion connection neural network at 20Hz, for example, would need 12.8W of DRAM access, which is much outside the power limits of a common mobile device.
 
 <img src="https://github.com/LechenQian/pruning_2/blob/main/figures/size_current.jpg" width="100%" />
 
-Additionally, the architecture was predesigned for the network prior to training, which prevents training from optimizing the architecture. In order to overcome these restrictions, this study[1] outline a pruning technique for learning only the crucial connections, which allows neural networks to store and compute an order of magnitude less data while maintaining their accuracy. Artificial neural networks, which loosely model the neurons in a biological brain. Interestingly, this training process learns the network connectivity and weights very much similar to human brain[2]: during brain matures, some neurons will be lost through apoptosis, which helps to shape the brain and create functional neural networks.
+Additionally, the architecture was predesigned for the network prior to training, which prevents training from optimizing the architecture. In order to overcome these restrictions, this highly cited study[1] outline a pruning technique for learning only the crucial connections, which allows neural networks to store and compute an order of magnitude less data while maintaining their accuracy. Artificial neural networks, which loosely model the neurons in a biological brain. Interestingly, this training process learns the network connectivity and weights very much similar to human brain[2]: during brain matures, some neurons will be lost through apoptosis, which helps to shape the brain and create functional neural networks.
 
 
 I would like to deep dive into the paper from Han, Song, et al. - "Learning both Weights and Connections for Efficient Neural Networks". This study proposes a three-step method for training lightweight neural networks that both reduce model size and latency while maintaining high accuracy. I will showcase the effect of pruning using a small CNN model on MNIST dataset.
